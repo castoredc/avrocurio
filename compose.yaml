@@ -1,0 +1,11 @@
+services:
+  apicurio-registry:
+    image: apicurio/apicurio-registry:latest-release
+    ports:
+      - "127.0.0.1:8080:8080"
+  apicurio-registry-ui:
+    image: apicurio/apicurio-registry-ui:latest-release
+    ports:
+      - "127.0.0.1:8888:8080"
+    depends_on:
+      - apicurio-registry

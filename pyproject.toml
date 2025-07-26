@@ -1,0 +1,80 @@
+[project]
+name = "avrocurio"
+dynamic = ["version"]
+description = "Apache Avro serialization/deserialization with Confluent Schema Registry framing and Apicurio integration"
+readme = "README.md"
+authors = [{ name = "Castor", email = "dev@castoredc.com" }]
+maintainers = [{ name = "Nick Groenen", email = "nick.groenen@castoredc.com" }]
+license = "BSD-2-Clause-Patent"
+urls = { "source" = "https://github.com/castoredc/avrocurio/" }
+requires-python = ">=3.10"
+dependencies = [
+    "fastavro>=1.9.0",
+    "httpx>=0.27.0",
+    "dataclasses-avroschema>=0.62.0",
+    "typing-extensions>=4.0.0",
+    "cachetools>=5.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "hatch>=1.14.1",
+    "pre-commit>=4.2.0",
+    "pyright>=1.1.403",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-mock>=3.12.0",
+    "ruff>=0.12.7",
+]
+
+[build-system]
+requires = ["hatchling>=1.26.1", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D104",   # Missing docstring in public package
+    "D106",   # Missing docstring in public method
+    "D107",   # Missing docstring in __init__
+    "D100",   # Missing docstring in public module
+    "D203",   # Incompatible together with D211
+    "D212",   # Incompatible together with D213
+    "COM812", # Redundant if using Ruff formatter which we are.
+    "EM101",  # Raw string in exception
+    "TRY003", # Long exception message outside exception class
+    "BLE001", # Catching of bare except
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "D",       # Ignore all docstring errors in tests
+    "ANN",     # Test functions shouldn't require type annotations
+    "S101",    # Use of assert in tests is expected
+    "S106",    # Passwords in unit tests shouldn't be sensitive
+    "PLR2004", # Replace magic values with named constants
+    "SLF001",  # Private member access
+]
+"src/avrocurio/exceptions.py" = [
+    "D105", # Missing docstring in magic method
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "--strict-markers"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: marks tests as integration tests requiring Apicurio Registry",
+]

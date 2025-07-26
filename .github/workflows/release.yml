@@ -1,0 +1,35 @@
+name: "Upload releases to PyPI"
+
+"on":
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish-test-pypi:
+    name: Upload release to test PyPI
+    runs-on: ubuntu-latest
+    environment: test-pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Build package distributions
+        run: uv run hatch build
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/

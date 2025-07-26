@@ -1,0 +1,152 @@
+name: CI
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ruff-check:
+    name: Ruff Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run Ruff linting
+        run: uv run ruff check
+
+  ruff-format:
+    name: Ruff Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run Ruff formatting check
+        run: uv run ruff format --check
+
+  pyright:
+    name: Pyright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run Pyright
+        run: uv run pyright
+
+  pre-commit:
+    name: Pre-commit
+    runs-on: ubuntu-latest
+    env:
+      # These have dedicated jobs in the workflow, so we skip them here to avoid redundancy.
+      SKIP: "ruff,ruff-format,pyright"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: set PYVERSION
+        run: echo "PYVERSION=$(python --version | tr ' ' '-')" >> $GITHUB_ENV
+
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.cache/pre-commit
+          # Changes to pre-commit-config.yaml may require the installation of
+          # new binaries/scripts. When a cache hit occurs, changes to the cache
+          # aren't persisted at the end of the run, so making the key dependent
+          # on the configuration file ensures we always persist a complete cache.
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}@${{ env.PYVERSION }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run pre-commit
+        run: uv run pre-commit run --all --color=always --show-diff-on-failure
+
+  test:
+    name: Python ${{ matrix.python-version }} unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run unit tests
+        run: uv run pytest -m "not integration" -v
+
+  integration-test:
+    name: Python ${{ matrix.python-version }} integration tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    services:
+      apicurio:
+        image: apicurio/apicurio-registry:latest-release
+        ports:
+          - 8080:8080
+        options: >-
+          --health-cmd "curl -f http://localhost:8080/health/ready || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run integration tests
+        run: uv run pytest -m integration -v
+        env:
+          APICURIO_REGISTRY_URL: http://localhost:8080

@@ -1,0 +1,16 @@
+extends: default
+
+rules:
+  # make some rules stricter
+  truthy:
+    level: error
+
+  # make some rules less strict. to be re-considered maybe
+  document-start: disable
+  empty-values:
+    level: warning
+    forbid-in-block-mappings: true
+    forbid-in-flow-mappings: true
+  line-length:
+    max: 120
+    level: warning
