@@ -1,0 +1,30 @@
+[project]
+name = "avrocurio"
+version = "0.1.0"
+description = "Apache Avro serialization/deserialization with Confluent Schema Registry framing and Apicurio integration"
+readme = "README.md"
+authors = [{ name = "Nick Groenen", email = "nick.groenen@castoredc.com" }]
+requires-python = ">=3.13"
+dependencies = [
+    "fastavro>=1.9.0",
+    "httpx>=0.27.0",
+    "dataclasses-avroschema>=0.62.0",
+    "typing-extensions>=4.0.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "pytest-mock>=3.12.0"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "--strict-markers"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: marks tests as integration tests requiring Apicurio Registry"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
