@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: cef0300fd0fc4d2a87a85fa2093c6b283ea36f4b # frozen: v5.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 895ebb389825c29bd4e0addcf7579d6c69d199cc # frozen: v0.9.6
+    hooks:
+      - id: ruff
+      - id: ruff-format
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: 81e9f98ffd059efe8aa9c1b1a42e5cce61b640c6 # frozen: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [--no-warnings]
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: 70eb305a67dde70c1fc0f14c5dac69586a12cb69 # frozen: v1.1.394
+    hooks:
+      - id: pyright
+  - repo: https://github.com/google/yamlfmt
+    rev: ac76bb931851dda64a55ef746ca9b8bb41634b98 # frozen: v0.16.0
+    hooks:
+      - id: yamlfmt
+  - repo: https://github.com/codespell-project/codespell
+    rev: 63c8f8312b7559622c0d82815639671ae42132ac # frozen: v2.4.1
+    hooks:
+      - id: codespell
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 0371566fc9b61bd2cacd420c21545a26459732a2 # frozen: 39.171.1
+    hooks:
+      - id: renovate-config-validator
