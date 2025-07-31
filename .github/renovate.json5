@@ -1,7 +1,25 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:best-practices",
     "schedule:monthly",
-    "local>castoredc/renovate-config"
-  ]
+    // Group updates to linters together in one PR
+    "group:linters",
+    ":semanticCommitsDisabled",
+  ],
+  // Code review will still block renovate from merging automatically,
+  // this just saves reviewers time by immediately auto-merging on approval.
+  automerge: true,
+  dependencyDashboard: true,
+  labels: ["dependencies"],
+  lockFileMaintenance: {
+    enabled: true,
+  },
+  packageRules: [
+    {
+      matchCategories: ["python"],
+      minimumReleaseAge: "7 days",
+    },
+  ],
+  ignorePaths: [],
 }
