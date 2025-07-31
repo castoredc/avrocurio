@@ -1,3 +1,11 @@
+## [0.1.6](https://github.com/castoredc/avrocurio/tree/v0.1.6) - 2025-07-31
+
+### Miscellaneous
+
+- Adding IDE files to gitignore
+- Testing the release process
+
+
 ## [0.1.5](https://github.com/castoredc/avrocurio/tree/v0.1.5) - 2025-07-31
 
 ### Fixes
