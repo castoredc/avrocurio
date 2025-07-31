@@ -40,7 +40,7 @@ make-new-release VERSION:
     fi
 
     COMMITMSG=$(mktemp --tmpdir commitmsg.XXXXXXXXXX)
-    CHANGES=$(mktemp --tmpdir commitmsg.XXXXXXXXXX)
+    CHANGES=$(mktemp --tmpdir changelog.XXXXXXXXXX)
     trap 'rm "$COMMITMSG"' EXIT
     set -x
 
