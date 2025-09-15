@@ -58,7 +58,7 @@ class ConfluentWireFormat:
             raise InvalidWireFormatError(msg)
 
         # Unpack magic byte (1 byte) + schema ID (4 bytes, big-endian)
-        magic_byte, schema_id = struct.unpack(">BI", message[: ConfluentWireFormat.HEADER_SIZE])
+        _magic_byte, schema_id = struct.unpack(">BI", message[: ConfluentWireFormat.HEADER_SIZE])
         payload = message[ConfluentWireFormat.HEADER_SIZE :]
 
         return schema_id, payload
