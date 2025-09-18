@@ -80,5 +80,5 @@ class ConfluentWireFormat:
 
         magic_byte = message[0]
         if magic_byte != ConfluentWireFormat.MAGIC_BYTE:
-            msg = f"Invalid magic byte. Expected {ConfluentWireFormat.MAGIC_BYTE}, got {magic_byte}"
+            msg = f"Invalid magic byte. Expected {ConfluentWireFormat.MAGIC_BYTE!r}, got {magic_byte!r}"
             raise InvalidWireFormatError(msg)

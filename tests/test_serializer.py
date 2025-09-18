@@ -1,5 +1,6 @@
 """Tests for Avro serializer/deserializer."""
 
+import struct
 from unittest.mock import AsyncMock
 
 import pytest
@@ -365,3 +366,16 @@ class TestAvroSerializer:
         assert isinstance(result, SimpleUser)
         assert result.name == "Compatibility User"
         assert result.age == 25
+
+    @pytest.mark.asyncio
+    async def test_deserialize_non_bytes_type(self, serializer):
+        # Create a string that looks like valid Confluent wire format
+        magic_byte = b"\x00"
+        schema_id = struct.pack(">I", 12345)
+        payload = b"test_payload"
+        message = magic_byte + schema_id + payload
+
+        # Convert to string (this is what we want to prevent)
+        str_message = message.decode("latin1")
+        with pytest.raises(DeserializationError, match="message is of type str, but should be bytes"):
+            await serializer.deserialize(str_message, SimpleUser)
