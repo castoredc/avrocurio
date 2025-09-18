@@ -150,7 +150,12 @@ class AvroSerializer:
             raise
         except Exception as e:
             msg = f"Failed to deserialize message: {e}"
-            raise DeserializationError(msg) from e
+            new_exc = DeserializationError(msg)
+            if isinstance(message, str):
+                new_exc.add_note(
+                    "Hint: message is of type str, but should be bytes. Did some unintended decoding happen?"
+                )
+            raise new_exc from e
 
     async def register_schema(self, obj: AvroModel, group: str, artifact_name: str) -> int:
         """
