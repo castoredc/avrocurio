@@ -104,7 +104,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
 
@@ -126,7 +126,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
     services:
       apicurio:
         image: apicurio/apicurio-registry:latest-release@sha256:5e1c552a76afd1ba23dc1368a867dcd6e9f49ef26eafb15c1e2b0be40c31b021
