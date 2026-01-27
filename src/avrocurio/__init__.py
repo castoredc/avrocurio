@@ -1,5 +1,6 @@
 """AvroCurio: Apache Avro serialization with Confluent Schema Registry framing and Apicurio integration."""
 
+from .apicurio_client import ApicurioClient
 from .config import ApicurioConfig
 from .exceptions import (
     AvroCurioError,
@@ -10,7 +11,8 @@ from .exceptions import (
     SchemaNotFoundError,
     SerializationError,
 )
-from .schema_client import ApicurioClient
+from .inmemory_client import InMemoryClient
+from .protocol import SchemaRegistryClient
 from .serializer import AvroSerializer
 
 __all__ = [
@@ -19,10 +21,12 @@ __all__ = [
     "AvroCurioError",
     "AvroSerializer",
     "DeserializationError",
+    "InMemoryClient",
     "InvalidWireFormatError",
     "SchemaMatchError",
     "SchemaMismatchError",
     "SchemaNotFoundError",
+    "SchemaRegistryClient",
     "SerializationError",
     "create_serializer",
 ]

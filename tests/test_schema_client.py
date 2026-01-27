@@ -8,9 +8,9 @@ from unittest.mock import AsyncMock, Mock
 import httpx
 import pytest
 
+from avrocurio.apicurio_client import ApicurioClient, CachedError
 from avrocurio.config import ApicurioConfig
 from avrocurio.exceptions import AvroCurioError, SchemaNotFoundError
-from avrocurio.schema_client import ApicurioClient, CachedError
 
 
 @pytest.fixture

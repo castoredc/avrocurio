@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+from avrocurio.apicurio_client import ApicurioClient
 from avrocurio.config import ApicurioConfig
 from avrocurio.exceptions import DeserializationError, SchemaMatchError, SchemaRegistrationError, SerializationError
-from avrocurio.schema_client import ApicurioClient
 from avrocurio.serializer import AvroSerializer
 
 from .test_schemas import ComplexUser, SimpleUser
