@@ -4,7 +4,7 @@ import asyncio
 import json
 from dataclasses import dataclass
 from types import TracebackType
-from typing import Any
+from typing import Any, Self
 
 from .exceptions import AvroCurioError, SchemaNotFoundError
 
@@ -42,7 +42,7 @@ class InMemoryClient:
         self._schema_to_global_id: dict[str, int] = {}  # normalized_schema -> global_id
         self._lock = asyncio.Lock()
 
-    async def __aenter__(self) -> "InMemoryClient":
+    async def __aenter__(self) -> Self:
         """Async context manager entry."""
         return self
 

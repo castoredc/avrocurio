@@ -5,7 +5,7 @@ import json
 from dataclasses import dataclass
 from http import HTTPStatus
 from types import TracebackType
-from typing import Any
+from typing import Any, Self
 
 import httpx
 from cachetools import TTLCache
@@ -63,7 +63,7 @@ class ApicurioClient:
         )
         self._failed_lookup_cache_lock = asyncio.Lock()
 
-    async def __aenter__(self) -> "ApicurioClient":
+    async def __aenter__(self) -> Self:
         """Async context manager entry."""
         return self
 
