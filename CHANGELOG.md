@@ -1,3 +1,12 @@
+## [1.2.0](https://github.com/castoredc/avrocurio/tree/v1.2.0) - 2026-01-28
+
+### New Features
+
+- Add an in-memory schema-registry client
+
+  An in-memory implementation of the schema registry client has been added which can be used for development and testing purposes, removing the need to run a live instance of Apicurio. ([#29](https://github.com/castoredc/avrocurio/issues/29))
+
+
 ## [1.1.0](https://github.com/castoredc/avrocurio/tree/v1.1.0) - 2025-10-13
 
 ### Changes
