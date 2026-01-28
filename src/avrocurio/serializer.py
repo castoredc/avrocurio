@@ -14,7 +14,7 @@ from .exceptions import (
     SchemaRegistrationError,
     SerializationError,
 )
-from .schema_client import ApicurioClient
+from .protocol import SchemaRegistryClient
 from .wire_format import ConfluentWireFormat
 
 T = TypeVar("T", bound=AvroModel)
@@ -25,15 +25,18 @@ class AvroSerializer:
     Async Avro serializer/deserializer using Confluent Schema Registry wire format.
 
     This class handles serialization and deserialization of AvroModel objects
-    with Confluent Schema Registry framing and Apicurio for schema management.
+    with Confluent Schema Registry framing and schema registry management.
+
+    The serializer accepts any client that implements the SchemaRegistryClient
+    protocol, including ApicurioClient and InMemoryClient.
     """
 
-    def __init__(self, client: ApicurioClient) -> None:
+    def __init__(self, client: SchemaRegistryClient) -> None:
         """
         Initialize the Avro serializer.
 
         Args:
-            client: Apicurio client for schema operations
+            client: Schema registry client (ApicurioClient or InMemoryClient)
 
         """
         self.client = client

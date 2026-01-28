@@ -72,7 +72,10 @@ class TestCreateSerializer:
 
         assert isinstance(serializer, AvroSerializer)
         assert isinstance(serializer.client, ApicurioClient)
-        assert serializer.client.config == config
+        # Type assertion for accessing ApicurioClient-specific attributes
+        client = serializer.client
+        assert isinstance(client, ApicurioClient)
+        assert client.config == config
 
     @pytest.mark.asyncio
     async def test_create_serializer_with_auth(self):
@@ -82,7 +85,10 @@ class TestCreateSerializer:
         serializer = await create_serializer(config)
 
         assert isinstance(serializer, AvroSerializer)
-        assert serializer.client.config.auth == ("user", "pass")
+        # Type assertion for accessing ApicurioClient-specific attributes
+        client = serializer.client
+        assert isinstance(client, ApicurioClient)
+        assert client.config.auth == ("user", "pass")
 
     @pytest.mark.asyncio
     async def test_create_serializer_returns_configured_client(self):
