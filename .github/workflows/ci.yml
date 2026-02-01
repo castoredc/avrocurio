@@ -129,7 +129,7 @@ jobs:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
     services:
       apicurio:
-        image: apicurio/apicurio-registry:latest-release@sha256:627dde93fd1f2a109bd67d09c83bdd6b5bb64d0ca97e6a0540836f3f59572c3c
+        image: apicurio/apicurio-registry:latest-release@sha256:3ff121c9f744d535ef770b80ff95693bc95063295316a5864b56312b6edfb4e2
         ports:
           - 8080:8080
         options: >-
