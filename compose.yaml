@@ -4,7 +4,7 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
   apicurio-registry-ui:
-    image: apicurio/apicurio-registry-ui:latest-release@sha256:38e20ed9492953d45adb0b835c782b287608bef6cccae2e90c3e057e678f502d
+    image: apicurio/apicurio-registry-ui:latest-release@sha256:9ab64e1d619aae279135a18cd7387c671c0a7429e86bccbec4b3e02a258ed579
     ports:
       - "127.0.0.1:8888:8080"
     depends_on:
