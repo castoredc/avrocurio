@@ -1,3 +1,8 @@
+## [1.2.1](https://github.com/castoredc/avrocurio/tree/v1.2.1) - 2026-02-11
+
+No significant changes.
+
+
 ## [1.2.0](https://github.com/castoredc/avrocurio/tree/v1.2.0) - 2026-01-28
 
 ### New Features
