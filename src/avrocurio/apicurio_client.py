@@ -154,7 +154,7 @@ class ApicurioClient:
 
     async def get_latest_schema(self, group_id: str, artifact_id: str) -> tuple[int, dict[str, Any]]:
         """
-        Get the latest version of a schema by group and artifact ID.
+        Get the latest version of a schema by group and artifact ID with LRU caching.
 
         Args:
             group_id: Group ID containing the artifact
@@ -168,6 +168,13 @@ class ApicurioClient:
             AvroCurioError: For other API errors
 
         """
+        cache_key = (group_id, artifact_id)
+        async with self._schema_cache_lock:
+            cached_global_id = self._schema_cache.get(cache_key)
+        if cached_global_id is not None:
+            schema = await self.get_schema_by_global_id(cached_global_id)
+            return cached_global_id, schema
+
         try:
             # First get the artifact metadata to find the latest version
             url = f"/apis/registry/v3/groups/{group_id}/artifacts/{artifact_id}/versions/branch=latest"
@@ -197,6 +204,9 @@ class ApicurioClient:
 
         # Now fetch the actual schema content
         schema = await self.get_schema_by_global_id(global_id)
+
+        async with self._schema_cache_lock:
+            self._schema_cache[cache_key] = global_id
         return global_id, schema
 
     async def search_artifacts(self, name: str | None = None, artifact_type: str = "AVRO") -> list[dict[str, Any]]:
