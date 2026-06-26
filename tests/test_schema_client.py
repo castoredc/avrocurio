@@ -201,7 +201,7 @@ class TestApicurioClient:
         schema_id = 12345
 
         # Pre-populate both the artifact→global_id mapping and the schema itself
-        client._schema_cache[("default", "user-schema")] = schema_id
+        client._artifact_id_to_global_id_cache[("default", "user-schema")] = schema_id
         client._schema_cache[schema_id] = sample_schema
 
         mock_client = AsyncMock()
@@ -214,21 +214,31 @@ class TestApicurioClient:
         client._client.get.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_get_latest_schema_cache_key_isolation(self, config, sample_schema):
-        """Test that a cache hit for one artifact does not affect a different one."""
+    async def test_get_latest_schema_cache_key_isolation(self, config, sample_schema, mock_success_response):
+        """Test that a cache hit for one artifact does not cause a hit for a different one."""
         client = ApicurioClient(config)
 
         # Only pre-populate "group-a/schema"; leave "group-b/schema" uncached
-        client._schema_cache[("group-a", "schema")] = 1
+        client._artifact_id_to_global_id_cache[("group-a", "schema")] = 1
         client._schema_cache[1] = sample_schema
 
+        # group-b requires two network calls: metadata + schema content
         mock_client = AsyncMock()
+        mock_client.get.side_effect = [
+            mock_success_response({"globalId": 2}, is_json=True),
+            mock_success_response(sample_schema, is_json=False),
+        ]
         client._client = mock_client
 
-        # group-a hit: no HTTP calls
-        schema, _ = await client.get_latest_schema("group-a", "schema")
-        assert schema == 1
-        client._client.get.assert_not_called()
+        # group-a is cached: no HTTP calls
+        gid_a, _ = await client.get_latest_schema("group-a", "schema")
+        assert gid_a == 1
+        mock_client.get.assert_not_called()
+
+        # group-b is not cached: must hit the network
+        gid_b, _ = await client.get_latest_schema("group-b", "schema")
+        assert gid_b == 2
+        assert mock_client.get.call_count == 2
 
     @pytest.mark.asyncio
     async def test_search_artifacts_success(self, config):

@@ -63,6 +63,12 @@ class ApicurioClient:
         )
         self._failed_lookup_cache_lock = asyncio.Lock()
 
+        self._artifact_id_to_global_id_cache = TTLCache(
+            maxsize=config.latest_schema_cache_size,
+            ttl=config.latest_schema_cache_ttl,
+        )
+        self._artifact_id_to_global_id_cache_lock = asyncio.Lock()
+
     async def __aenter__(self) -> Self:
         """Async context manager entry."""
         return self
@@ -81,6 +87,7 @@ class ApicurioClient:
         await self._client.aclose()
         self._schema_cache.clear()
         self._failed_lookup_cache.clear()
+        self._artifact_id_to_global_id_cache.clear()
 
     async def _raise_if_previous_lookup_failed(self, global_id: int) -> None:
         """Check failed lookup cache and raise if found."""
@@ -154,7 +161,7 @@ class ApicurioClient:
 
     async def get_latest_schema(self, group_id: str, artifact_id: str) -> tuple[int, dict[str, Any]]:
         """
-        Get the latest version of a schema by group and artifact ID with LRU caching.
+        Get the latest version of a schema by group and artifact ID with TTL caching.
 
         Args:
             group_id: Group ID containing the artifact
@@ -168,9 +175,8 @@ class ApicurioClient:
             AvroCurioError: For other API errors
 
         """
-        cache_key = (group_id, artifact_id)
-        async with self._schema_cache_lock:
-            cached_global_id = self._schema_cache.get(cache_key)
+        async with self._artifact_id_to_global_id_cache_lock:
+            cached_global_id = self._artifact_id_to_global_id_cache.get((group_id, artifact_id))
         if cached_global_id is not None:
             schema = await self.get_schema_by_global_id(cached_global_id)
             return cached_global_id, schema
@@ -205,8 +211,8 @@ class ApicurioClient:
         # Now fetch the actual schema content
         schema = await self.get_schema_by_global_id(global_id)
 
-        async with self._schema_cache_lock:
-            self._schema_cache[cache_key] = global_id
+        async with self._artifact_id_to_global_id_cache_lock:
+            self._artifact_id_to_global_id_cache[(group_id, artifact_id)] = global_id
         return global_id, schema
 
     async def search_artifacts(self, name: str | None = None, artifact_type: str = "AVRO") -> list[dict[str, Any]]:
@@ -417,6 +423,8 @@ class ApicurioClient:
             self._schema_cache.clear()
         async with self._failed_lookup_cache_lock:
             self._failed_lookup_cache.clear()
+        async with self._artifact_id_to_global_id_cache_lock:
+            self._artifact_id_to_global_id_cache.clear()
 
     async def get_cache_stats(self) -> dict[str, Any]:
         """
@@ -435,10 +443,18 @@ class ApicurioClient:
             failed_max_size = self._failed_lookup_cache.maxsize
             failed_ttl = self._failed_lookup_cache.ttl
 
+        async with self._artifact_id_to_global_id_cache_lock:
+            latest_size = len(self._artifact_id_to_global_id_cache)
+            latest_max_size = self._artifact_id_to_global_id_cache.maxsize
+            latest_ttl = self._artifact_id_to_global_id_cache.ttl
+
         return {
             "schema_cache_size": schema_size,
             "schema_cache_max_size": schema_max_size,
             "failed_lookup_cache_size": failed_size,
             "failed_lookup_cache_max_size": failed_max_size,
             "failed_lookup_cache_ttl": failed_ttl,
+            "latest_schema_cache_size": latest_size,
+            "latest_schema_cache_max_size": latest_max_size,
+            "latest_schema_cache_ttl": latest_ttl,
         }
