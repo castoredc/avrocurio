@@ -195,6 +195,52 @@ class TestApicurioClient:
             await client.get_latest_schema("default", "user-schema")
 
     @pytest.mark.asyncio
+    async def test_get_latest_schema_cached(self, config, sample_schema):
+        """Test cached latest schema retrieval skips the network."""
+        client = ApicurioClient(config)
+        schema_id = 12345
+
+        # Pre-populate both the artifact→global_id mapping and the schema itself
+        client._artifact_id_to_global_id_cache[("default", "user-schema")] = schema_id
+        client._schema_cache[schema_id] = sample_schema
+
+        mock_client = AsyncMock()
+        client._client = mock_client
+
+        global_id, schema = await client.get_latest_schema("default", "user-schema")
+
+        assert global_id == schema_id
+        assert schema == sample_schema
+        client._client.get.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_get_latest_schema_cache_key_isolation(self, config, sample_schema, mock_success_response):
+        """Test that a cache hit for one artifact does not cause a hit for a different one."""
+        client = ApicurioClient(config)
+
+        # Only pre-populate "group-a/schema"; leave "group-b/schema" uncached
+        client._artifact_id_to_global_id_cache[("group-a", "schema")] = 1
+        client._schema_cache[1] = sample_schema
+
+        # group-b requires two network calls: metadata + schema content
+        mock_client = AsyncMock()
+        mock_client.get.side_effect = [
+            mock_success_response({"globalId": 2}, is_json=True),
+            mock_success_response(sample_schema, is_json=False),
+        ]
+        client._client = mock_client
+
+        # group-a is cached: no HTTP calls
+        gid_a, _ = await client.get_latest_schema("group-a", "schema")
+        assert gid_a == 1
+        mock_client.get.assert_not_called()
+
+        # group-b is not cached: must hit the network
+        gid_b, _ = await client.get_latest_schema("group-b", "schema")
+        assert gid_b == 2
+        assert mock_client.get.call_count == 2
+
+    @pytest.mark.asyncio
     async def test_search_artifacts_success(self, config):
         """Test successful artifact search."""
         client = ApicurioClient(config)

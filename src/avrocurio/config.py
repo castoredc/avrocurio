@@ -16,6 +16,8 @@ class ApicurioConfig:
         schema_cache_size: Maximum number of schemas to cache (0 disables caching)
         failed_lookup_cache_size: Maximum number of failed lookups to cache (0 disables caching)
         failed_lookup_cache_ttl: TTL in seconds for failed lookup cache entries
+        latest_schema_cache_size: Maximum number of artifact→global_id mappings to cache
+        latest_schema_cache_ttl: TTL in seconds for artifact→global_id cache entries
 
     """
 
@@ -26,3 +28,5 @@ class ApicurioConfig:
     schema_cache_size: int = 1000
     failed_lookup_cache_size: int = 100
     failed_lookup_cache_ttl: int = 300
+    latest_schema_cache_size: int = 1000
+    latest_schema_cache_ttl: int = 600
