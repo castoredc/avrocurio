@@ -51,19 +51,19 @@ class ApicurioClient:
             headers={"Content-Type": "application/json"},
         )
 
-        self._schema_cache = TTLCache(
+        self._schema_cache = TTLCache[int, dict[str, Any]](
             maxsize=config.schema_cache_size,
             ttl=float("inf"),
         )
         self._schema_cache_lock = asyncio.Lock()
 
-        self._failed_lookup_cache = TTLCache(
+        self._failed_lookup_cache = TTLCache[int, CachedError](
             maxsize=config.failed_lookup_cache_size,
             ttl=config.failed_lookup_cache_ttl,
         )
         self._failed_lookup_cache_lock = asyncio.Lock()
 
-        self._artifact_id_to_global_id_cache = TTLCache(
+        self._artifact_id_to_global_id_cache = TTLCache[tuple[str, str], int](
             maxsize=config.latest_schema_cache_size,
             ttl=config.latest_schema_cache_ttl,
         )
