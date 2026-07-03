@@ -1,3 +1,11 @@
+## [1.3.0](https://github.com/castoredc/avrocurio/tree/v1.3.0) - 2026-06-26
+
+### Changes
+
+- `get_latest_schema()` now uses a TTL cache to improve performance (defaults use size = 1000, ttl = 600).
+  If this is undesirable, set `latest_schema_cache_size = 0` to keep the previous behavior.
+
+
 ## [1.2.1](https://github.com/castoredc/avrocurio/tree/v1.2.1) - 2026-02-11
 
 No significant changes.
