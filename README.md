@@ -26,6 +26,7 @@ pip install avrocurio
 from dataclasses import dataclass
 from dataclasses_avroschema import AvroModel
 
+
 @dataclass
 class User(AvroModel):
     name: str
@@ -38,6 +39,7 @@ class User(AvroModel):
 ```python
 import asyncio
 from avrocurio import AvroSerializer, ApicurioClient, ApicurioConfig
+
 
 async def main():
     # Configure connection to Apicurio Registry
@@ -58,6 +60,7 @@ async def main():
 
         # Deserialize the binary back to a User instance.
         deserialized_user = await serializer.deserialize(serialized, User)
+
 
 asyncio.run(main())
 ```
