@@ -15,16 +15,28 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "integration: marks tests as integration tests requiring Apicurio")
 
 
+DEFAULT_APICURIO_URL = "http://localhost:8080"
+
+
+def apicurio_base_url() -> str:
+    """Base URL of the Apicurio Registry to test against."""
+    return os.getenv("APICURIO_URL", DEFAULT_APICURIO_URL)
+
+
 def pytest_runtest_setup(item):
     """Skip integration tests with an expect-fail when Apicurio is not available."""
     if "integration" in [mark.name for mark in item.iter_markers()] and not is_apicurio_available():
-        pytest.xfail("Apicurio Registry not available on localhost:8080")
+        pytest.xfail(f"Apicurio Registry not available on {apicurio_base_url()}")
 
 
 def is_apicurio_available() -> bool:
-    """Check if Apicurio Registry is running on localhost:8080."""
+    """Check if the Apicurio Registry API is reachable.
+
+    Probes the v3 API rather than /health: the health endpoints are served on the
+    separate Quarkus management port, not on the API port we actually talk to.
+    """
     try:
-        response = httpx.get("http://localhost:8080/health", timeout=5.0)
+        response = httpx.get(f"{apicurio_base_url()}/apis/registry/v3/system/info", timeout=5.0)
     except Exception:
         return False
     else:
@@ -34,8 +46,7 @@ def is_apicurio_available() -> bool:
 @pytest.fixture
 def apicurio_config() -> ApicurioConfig:
     """Configuration for local Apicurio Registry."""
-    base_url = os.getenv("APICURIO_URL", "http://localhost:8080")
-    return ApicurioConfig(base_url=base_url)
+    return ApicurioConfig(base_url=apicurio_base_url())
 
 
 @pytest.fixture

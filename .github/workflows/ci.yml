@@ -129,11 +129,11 @@ jobs:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
     services:
       apicurio:
-        image: apicurio/apicurio-registry:latest-release@sha256:3ff121c9f744d535ef770b80ff95693bc95063295316a5864b56312b6edfb4e2
+        image: apicurio/apicurio-registry:latest-release@sha256:e9476584866f9cbfd6b11c1fbdd0df64976277e069f54d537572032751a4b6fc
         ports:
           - 8080:8080
         options: >-
-          --health-cmd "curl -f http://localhost:8080/health/ready || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
+          --health-cmd "curl -f http://localhost:9000/health/ready || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -149,4 +149,4 @@ jobs:
       - name: Run integration tests
         run: uv run pytest -m integration -v
         env:
-          APICURIO_REGISTRY_URL: http://localhost:8080
+          APICURIO_URL: http://localhost:8080
