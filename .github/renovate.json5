@@ -3,9 +3,12 @@
   extends: [
     'config:best-practices',
     'schedule:monthly',
+    // Group updates to linters together in one PR
     'group:linters',
     ':semanticCommitsDisabled',
   ],
+  // Code review will still block renovate from merging automatically,
+  // this just saves reviewers time by immediately auto-merging on approval.
   automerge: true,
   dependencyDashboard: {
     enabled: true,
