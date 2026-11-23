@@ -35,6 +35,6 @@ repos:
     hooks:
       - id: codespell
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 0371566fc9b61bd2cacd420c21545a26459732a2 # frozen: 39.171.1
+    rev: ab5c6996bddbba298c12882584aa16b003bbbfd8 # frozen: 44.258.0
     hooks:
       - id: renovate-config-validator
